@@ -27,12 +27,13 @@ class AgoraHandler {
 
   /// if userRole is not provided then by default it is assumed to be Audience.
   Future<void> joinClub(String channelName, String token,
-      {ClientRole userRole}) async {
-    if (userRole == null) {
-      this._userRole = ClientRole.Audience;
+      {bool isHost = false}) async {
+    if (isHost) {
+      this._userRole = ClientRole.Broadcaster;
     } else {
-      this._userRole = userRole;
+      this._userRole = ClientRole.Audience;
     }
+
     if (this._userRole == ClientRole.Broadcaster) {
       final permission = await Permission.microphone.request();
 
@@ -63,7 +64,7 @@ class AgoraHandler {
   Future<void> muteSwitchMic(bool muted) async =>
       await this._engine.muteLocalAudioStream(muted);
 
-  void dispose() async {
+  Future<void> dispose() async {
     await this._engine?.destroy();
   }
 
