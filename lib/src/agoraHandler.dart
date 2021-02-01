@@ -9,32 +9,21 @@ class AgoraHandler {
 
   RtcEngine _engine;
 
-  /// by default, it's set to "Audience".
-  ClientRole _userRole;
-
   Future<void> init({String appId}) async {
     if (appId != null) {
-      this._appId = appId;
+      _appId = appId;
     }
 
-    this._engine = await RtcEngine.create(_appId);
-    await this._engine.enableAudio();
+    _engine = await RtcEngine.create(_appId);
+    await _engine.enableAudio();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    this._engine.setEventHandler(_eventHandler);
-
-    this._userRole = ClientRole.Audience;
+    _engine.setEventHandler(_eventHandler);
   }
 
   /// if userRole is not provided then by default it is assumed to be Audience.
   Future<void> joinClub(String channelName, String token,
       {bool isHost = false}) async {
     if (isHost) {
-      this._userRole = ClientRole.Broadcaster;
-    } else {
-      this._userRole = ClientRole.Audience;
-    }
-
-    if (this._userRole == ClientRole.Broadcaster) {
       final permission = await Permission.microphone.request();
 
       if (permission.isGranted != true) {
@@ -42,30 +31,29 @@ class AgoraHandler {
             "User denied pemission for microphone, can not allow user to be a broadcaster");
       }
 
-      await this._engine.enableLocalAudio(true);
-    } else {
-      await this._engine.enableLocalAudio(false);
-    }
+      await _engine.enableLocalAudio(true);
 
-    await this._engine.setClientRole(this._userRole);
-
-    if (this._userRole == ClientRole.Audience) {
-      await this._engine.switchChannel(token, channelName);
+      await _engine.setClientRole(ClientRole.Broadcaster);
+      await _engine.joinChannel(token, channelName, null, 1);
     } else {
-      await this._engine.joinChannel(token, channelName, null, 0);
+      await _engine.enableLocalAudio(false);
+
+      await _engine.setClientRole(ClientRole.Audience);
+
+      await _engine.switchChannel(token, channelName);
     }
   }
 
-  Future<void> leaveClub() async => await this._engine.leaveChannel();
+  Future<void> leaveClub() async => await _engine.leaveChannel();
 
   Future<void> muteSwitchClub(bool muted) async =>
-      await this._engine.muteAllRemoteAudioStreams(muted);
+      await _engine.muteAllRemoteAudioStreams(muted);
 
   Future<void> muteSwitchMic(bool muted) async =>
-      await this._engine.muteLocalAudioStream(muted);
+      await _engine.muteLocalAudioStream(muted);
 
   Future<void> dispose() async {
-    await this._engine?.destroy();
+    await _engine?.destroy();
   }
 
   final _eventHandler = RtcEngineEventHandler(
