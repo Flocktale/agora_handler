@@ -34,7 +34,7 @@ class AgoraHandler {
       await _engine.enableLocalAudio(true);
 
       await _engine.setClientRole(ClientRole.Broadcaster);
-      await _engine.joinChannel(token, channelName, null, 1);
+      await _engine.joinChannel(token, channelName, null, 0);
     } else {
       await _engine.enableLocalAudio(false);
 
