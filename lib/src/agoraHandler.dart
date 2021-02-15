@@ -23,6 +23,9 @@ class AgoraHandler {
   /// if userRole is not provided then by default it is assumed to be Audience.
   Future<void> joinClub(String channelName, String token,
       {bool isHost = false}) async {
+    // leaving any club if already played.
+    await leaveClub();
+
     if (isHost) {
       final permission = await Permission.microphone.request();
 
@@ -32,19 +35,22 @@ class AgoraHandler {
       }
 
       await _engine.enableLocalAudio(true);
-
       await _engine.setClientRole(ClientRole.Broadcaster);
-      await _engine.joinChannel(token, channelName, null, 0);
     } else {
       await _engine.enableLocalAudio(false);
-
       await _engine.setClientRole(ClientRole.Audience);
-
-      await _engine.switchChannel(token, channelName);
     }
+
+    await _engine.joinChannel(token, channelName, null, 0);
   }
 
-  Future<void> leaveClub() async => await _engine.leaveChannel();
+  Future<void> leaveClub() async {
+    try {
+      await _engine.leaveChannel();
+    } catch (e) {
+      print('error in leaving club $e');
+    }
+  }
 
   Future<void> muteSwitchClub(bool muted) async =>
       await _engine.muteAllRemoteAudioStreams(muted);
