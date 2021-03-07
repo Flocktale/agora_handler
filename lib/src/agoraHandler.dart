@@ -24,7 +24,7 @@ class AgoraHandler {
 
   /// if userRole is not provided then by default it is assumed to be Audience.
   Future<void> joinClub(String channelName, String token,
-      {bool isHost = false}) async {
+      {int integerUsername = 0, bool isHost = false}) async {
     // leaving any club if already played.
     await leaveClub();
 
@@ -43,7 +43,7 @@ class AgoraHandler {
       await _engine.setClientRole(ClientRole.Audience);
     }
 
-    await _engine.joinChannel(token, channelName, null, 0);
+    await _engine.joinChannel(token, channelName, null, integerUsername);
   }
 
   Future<void> leaveClub() async {
