@@ -14,8 +14,8 @@ class AgoraHandler {
     await _engine.enableAudio();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
 
-    // interval in ms, smoothness (sensitivity) on a scale of 10, true for local audio detection
-    await _engine.enableAudioVolumeIndication(500, 3, true);
+    // interval in ms, smoothness on a scale of 10, true for local audio detection
+    await _engine.enableAudioVolumeIndication(1000, 3, true);
 
     _engine.setEventHandler(_eventHandler);
 
